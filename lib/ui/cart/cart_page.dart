@@ -1,10 +1,13 @@
-/*import 'package:ecom_378/ui/app_widgets/primary_button.dart';
+import 'package:ecom_378/ui/app_widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../product_detail/bloc/cart_bloc.dart';
 import '../product_detail/bloc/cart_event.dart';
 import '../product_detail/bloc/cart_state.dart';
+import 'order/order_bloc.dart';
+import 'order/order_event.dart';
+import 'order/order_state.dart';
 
 class CartPage extends StatefulWidget {
   @override
@@ -12,6 +15,7 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
+   bool isLoading = false;
    int qty = 1;
 
    @override
@@ -155,7 +159,7 @@ class _CartPageState extends State<CartPage> {
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Text('Subtotal'),
-                                                  //Text('\$${state.cartItems.fold(0.0, (sum, item) => sum + (int.parse(item['price']) * item['quantity'])).toStringAsFixed(2)}'),
+                                                  Text('\$${state.cartItems.fold(0.0, (sum, item) => sum + (int.parse(item['price']) * item['quantity'])).toStringAsFixed(2)}'),
                                                 ],
                                               ),
                                               SizedBox(height: 8),
@@ -163,13 +167,38 @@ class _CartPageState extends State<CartPage> {
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Text('Total', style: TextStyle(fontWeight: FontWeight.bold)),
-                                                  //Text('\$${state.cartItems.fold(0.0, (sum, item) => sum + (int.parse(item['price']) * item['quantity'])).toStringAsFixed(2)}', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                  Text('\$${state.cartItems.fold(0.0, (sum, item) => sum + (int.parse(item['price']) * item['quantity'])).toStringAsFixed(2)}', style: TextStyle(fontWeight: FontWeight.bold)),
                                                 ],
                                               ),
                                               SizedBox(height: 16),
-                                              PrimaryButton(
-                                                  label: "Order",
-                                                  onPressed: (){})
+                                              BlocConsumer<OrderBloc, OrderState>(
+                                    listener:(_, state){
+                                      if(state is OrderLoadingState)
+                                      {
+                                        isLoading = true;
+                                      }
+                                      if(state is OrderSuccessState)
+                                      {
+                                        isLoading = false;
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text("Order created successfully"), backgroundColor: Colors.green,));
+                                      }
+                                      if(state is OrderFailureState)
+                                      {
+                                        isLoading = false;
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                          content: Text(state.errorMsg), backgroundColor: Colors.red,));
+                                      }
+                                    },
+                                    builder: (context, state){
+                                      return  PrimaryButton(
+                                          label:isLoading? "Please wait...":"Order",
+                                          onPressed: (){
+                                            context.read<OrderBloc>().add(CreateOrderEvent(
+                                                productId: item["id"],
+                                                ));
+                                          });
+                                    })
                                             ],
                                           ),
                                         ),
@@ -202,8 +231,8 @@ class _CartPageState extends State<CartPage> {
 
     );
   }
-}*/
-import 'package:ecom_378/ui/app_widgets/primary_button.dart';
+}
+/*import 'package:ecom_378/ui/app_widgets/primary_button.dart';
 import 'package:ecom_378/ui/cart/order/order_bloc.dart';
 import 'package:ecom_378/ui/cart/order/order_event.dart';
 import 'package:ecom_378/ui/cart/order/order_state.dart';
@@ -339,7 +368,7 @@ class _CartPageState extends State<CartPage> {
                             ),
                           ],
                         ),
-                       /* Align(
+                        Align(
                           alignment: Alignment.bottomCenter,
                           child: Padding(
                             padding: const EdgeInsets.all(6.0),
@@ -394,7 +423,7 @@ class _CartPageState extends State<CartPage> {
                               ],
                             ),
                           ),
-                        ),*/
+                        ),
                       ],
                     ),
                   ),
@@ -407,4 +436,4 @@ class _CartPageState extends State<CartPage> {
       ),
     );
   }
-}
+}*/
